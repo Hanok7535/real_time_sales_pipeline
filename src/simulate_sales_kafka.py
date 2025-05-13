@@ -1,30 +1,25 @@
-from kafka import KafkaProducer
+from kafka import KafkaConsumer
 import json
-import random
-import time
-from datetime import datetime, timezone
 
-producer = KafkaProducer(
-    bootstrap_servers='localhost:9092',
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
+def consume_sales():
+    consumer = KafkaConsumer(
+        'sales',
+        bootstrap_servers='localhost:9092',
+        value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+        auto_offset_reset='earliest',
+        group_id='sales-group'
+    )
 
-PRODUCTS = ["Laptop", "Phone", "Tablet", "Monitor", "Headphones"]
+    print("Consumer started. Waiting for messages...")
 
-def generate_sale():
-    return {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "product": random.choice(PRODUCTS),
-        "quantity": random.randint(1, 5),
-        "price": round(random.uniform(100, 1000), 2)
-    }
+    try:
+        for message in consumer:
+            print(f"Received: {message.value}")
+    except KeyboardInterrupt:
+        print("Consumer stopped by user.")
+    finally:
+        consumer.close()
 
-def stream_sales():
-    while True:
-        sale = generate_sale()
-        producer.send("sales_topic", sale)
-        print("Sent:", sale)
-        time.sleep(1)
+if __name__ == '__main__':
+    consume_sales()
 
-if __name__ == "__main__":
-    stream_sales()
