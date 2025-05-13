@@ -1,8 +1,10 @@
+#simulation-  infinite stream __ Ctrl+C to stop.
+
+
 import time
 import random
 import json
 from datetime import datetime, timezone
-#simulation-  infinite stream __ Ctrl+C to stop.
 
 # Sample data options
 products = ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard", "Mouse"]
